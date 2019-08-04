@@ -1,0 +1,78 @@
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Invoice </title>
+    
+    <style>
+
+            .container  {
+                width: 50%;
+                margin-right: auto;
+                margin-left: auto;
+                margin-top: 100px;
+
+            }
+            #invoice {
+              font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+              border-collapse: collapse;
+              width: 100%;
+            }
+            
+            #invoice td, #invoice th {
+              border: 1px solid #ddd;
+              padding: 8px;
+            }
+            
+            #invoice tr:nth-child(even){background-color: #f2f2f2;}
+            
+            #invoice tr:hover {background-color: #ddd;}
+            
+            #invoice th {
+              padding-top: 12px;
+              padding-bottom: 12px;
+              text-align: left;
+              background-color: #117fdf;
+              color: white;
+            }
+        </style>
+</head>
+
+<body>
+
+    <% data.forEach(function(bills){ %>
+        <div class="container">
+            <h2>Company: <%= bills[0].project %></h2>
+            <table id="invoice">
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Number of Hours</th>
+                        <th>Unit Price</th>
+                        <th>Cost</th>
+                    </tr>
+
+                    <%
+                    let total = 0;
+
+                    bills.forEach(function(value){ 
+                        total += value.cost    
+                    %>
+                        <tr>
+                            <td><%= value.employee %></td>
+                            <td><%= value.num_hrs %></td>
+                            <td><%= value.hour_rate %></td>
+                            <td><%= value.cost %></td>
+                        </tr>
+                    <% }); %>
+                    <tr style="border: 2px solid black;">
+                    <td></td>
+                    <td></td>
+                    <td>Total : <%= total %></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    <% }); %>
+</body>
+</html>

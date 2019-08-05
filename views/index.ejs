@@ -56,7 +56,7 @@
 
         <!-- <span>Upload your csv to continue</span> -->
         
-        <section id="upload-data-panel"  >
+        <section id="upload-data-panel">
           <form ref="formData" id="upload-form" action="/upload-csv" method="post" enctype="multipart/form-data">
               <fieldset>
                   <legend>Upload csv Data</legend>
@@ -65,8 +65,10 @@
                       <input type="file" name="csvdata" ref="csvdata" v-on:change="handleFileUpload()" accept="text/cvs">
                   </div>
                   <div class="warning-div">
-                    <span class="span-warning">Segun</span>
-                    {{ warning }}
+                    <span class="span-warning">
+                        {{ warning }}
+                    </span>
+                    
                   </div>
                   <p></p>
                   <div>
@@ -83,16 +85,31 @@
           el: '#app',
           data: {
             warning: '',
+            validated : false,
           },
           methods: {
             validateForm : function(){
-              console.log("Valida");
-              return;
+              if(this.validated == false){
+                return false;
+              }
+
+              this.$refs.formData.submit();
+              // return;
             },
             handleFileUpload(){
               const file = this.$refs.csvdata.files[0];
 
-              console.log(file)
+              if(file.type !== "text/csv"){
+                this.warning = "Uploaded file must be in csv file format";
+                return;
+              }
+
+              if(file.size == 0){
+                this.warning = "Invalid uploaded file";
+                return;
+              }
+              
+              this.validated = true;
             }
           }
         })

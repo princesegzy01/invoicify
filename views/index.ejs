@@ -3,27 +3,100 @@
   <head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="/javascripts/vue.js"></script>
+
+    <style>
+      .button {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        width: 100%;
+      }
+
+      .app-container {
+        width: 500px; 
+        margin-left: auto; 
+        margin-right: auto;
+        margin-top: 150px;
+      }
+
+      .img-logo {
+        margin-left: 15%;
+      }
+
+      .header-center {
+        text-align: center;
+      }
+
+      .span-warning {
+          color: red; 
+          font-size:12px; 
+          text-align: center;
+      }
+
+      .warning-div {
+        margin-top:10px; 
+        margin-bottom:10px;
+      }
+    </style>
   </head>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+    <div id="app" class="app-container">
+        <h1 class="header-center"><%= title %></h1>
+        <div>
+          <img class="img-logo" src="/images/image.png"/>
+        </div>
 
-    <h1>Upload your csv to continue</h1>
+        <!-- <span>Upload your csv to continue</span> -->
+        
+        <section id="upload-data-panel"  >
+          <form ref="formData" id="upload-form" action="/upload-csv" method="post" enctype="multipart/form-data">
+              <fieldset>
+                  <legend>Upload csv Data</legend>
+                  <div>
+                      <!-- The name here is important, and will be used later to reference the data -->
+                      <input type="file" name="csvdata" ref="csvdata" v-on:change="handleFileUpload()" accept="text/cvs">
+                  </div>
+                  <div class="warning-div">
+                    <span class="span-warning">Segun</span>
+                    {{ warning }}
+                  </div>
+                  <p></p>
+                  <div>
+                      <input @click.stop.prevent="validateForm()" type="submit" class="button" value="Submit CSV"/>
+                  </div>
+              </fieldset>
+          </form>
+      </section>
+    </div>
 
-    <section id="upload-data-panel">
-      <form id="upload-form" action="/upload-csv" method="post" enctype="multipart/form-data">
-          <fieldset>
-              <legend>Upload Data</legend>
-              <div>
-                  <!-- The name here is important, and will be used later to reference the data -->
-                  <input type="file" name="csvdata" accept="text/cvs">
-              </div>
-              <div>
-                  <input type="submit" value="Submit"/>
-              </div>
-          </fieldset>
-      </form>
-  </section>
+
+    <script>
+        var app = new Vue({
+          el: '#app',
+          data: {
+            warning: '',
+          },
+          methods: {
+            validateForm : function(){
+              console.log("Valida");
+              return;
+            },
+            handleFileUpload(){
+              const file = this.$refs.csvdata.files[0];
+
+              console.log(file)
+            }
+          }
+        })
+        </script>
 
   </body>
 </html>

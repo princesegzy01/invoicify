@@ -72,7 +72,7 @@
                   </div>
                   <p></p>
                   <div>
-                      <input @click.stop.prevent="validateForm()" type="submit" class="button" value="Submit CSV"/>
+                      <input @click.stop.prevent="validateForm()" type="submit" class="button" value="Upload CSV"/>
                   </div>
               </fieldset>
           </form>
@@ -97,6 +97,9 @@
               // return;
             },
             handleFileUpload(){
+
+              this.warning  = "";
+              
               const file = this.$refs.csvdata.files[0];
 
               if(file.type !== "text/csv"){

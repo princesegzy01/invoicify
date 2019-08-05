@@ -11,7 +11,7 @@
         "max-line-length": [true, 90],
         "object-literal-sort-keys": false,
         "no-console": false,
-        "indent": [true, "tabs", 2],
+        "indent": [true, "tabs", 4],
         "no-trailing-whitespace": false,
         "quotemark": [true, "double"],
         "newline-per-chained-call": false,

@@ -1,117 +1,111 @@
 import express from "express";
 import moment from "moment";
-var slugify = require('slugify')
-
-
 import _ from "lodash";
 
-const http = require('http');
-const fs = require('fs');
 
-const multer = require('multer');
-const csv = require('fast-csv');
 
-const upload = multer({ dest: 'tmp/csv/' });
+const fs = require("fs");
+
+const multer = require("multer");
+const csv = require("fast-csv");
+
+const upload = multer({ dest: "tmp/csv/" });
 
 const router = express.Router();
 
 /* GET home page. */
-router.post("/", upload.single('csvdata'), (req: express.Request , res: express.Response, next) => {
+router.post("/", upload.single("csvdata"), (req: express.Request , res: express.Response, next) => {
 
-        // container to handle all processed bill
-        const fileRows: Array<any> = [];
+    // container to handle all processed bill
+    const fileRows: any[] = [];
 
-        let x = 0;
-        csv.parseFile(req.file.path).on("data", function (data: Array<string>) {
+    let x = 0;
+        csv.parseFile(req.file.path).on("data", (data: string[]) => {
 
-                let data_line:Array<any> = data;
-        
-                if (x == 0 ) {
+			let dataLine: any[] = data;
+	
+			if (x === 0 ) {
 
-                        // add extra colum headers to the headings
-                        data_line.push("cost");
-                        data_line.push("num hrs");
-                }else{
+				// add extra colum headers to the headings
+				dataLine.push("cost");
+				dataLine.push("num hrs");
+			} else {
 
-                        let full_start_date = data_line[3] + " " +  data_line[4];
-                        let full_end_date = data_line[3] + " " +  data_line[5];
-        
-                        // get hour differences between the start time and end time.
-                        const num_hours = getHourDifference(full_start_date, full_end_date);
+				const fullStartDate = dataLine[3] + " " +  dataLine[4];
+				const fullEndDate = dataLine[3] + " " +  dataLine[5];
 
-                        // get the lawyer billbable rate per hour
-                        let billableRate: number = parseFloat(data_line[1]);
+				// get hour differences between the start time and end time.
+				const num_hours = getHourDifference(fullStartDate, fullEndDate);
 
-                        // get the total cost by multiplying 
-                        // billable hour by the hours spent
-                        let totalBill: number = billableRate * num_hours;
+				// get the lawyer billbable rate per hour
+				let billableRate: number = parseFloat(dataLine[1]);
 
-                        // push the 2 new colum to the bill array
-                        data_line.push(totalBill);
-                        data_line.push(num_hours);
-                }
+				// get the total cost by multiplying 
+				// billable hour by the hours spent
+				let totalBill: number = billableRate * num_hours;
+
+				// push the 2 new colum to the bill array
+				dataLine.push(totalBill);
+				dataLine.push(num_hours);
+			}
+			
+			// push each processed bill to a new array
+			fileRows.push(dataLine);
+
+			x += 1; 
+
+    	}).on("end", () => {
                 
-                // push each processed bill to a new array
-                fileRows.push(data_line)
+			// delete the heading from the csv array
+			fileRows.shift();
+			const dataBody = fileRows;
 
-                x += 1; 
+			// create a bill array
+			let billArray: object[] = [];
 
-       
-        }).on("end", function () {
-                
-                // delete the heading from the csv array
-                fileRows.shift()
-                let data_body = fileRows;
+			// loop through all bills and create a bill objects from it
+			dataBody.forEach((element) => { 
 
-                // create a bill array
-                let bill_array: Array<Object> = [];
+				const billObj = {
+					employee : element[0],
+					hour_rate : element[1],
+					project : element[2],
+					cost : element[6],
+					num_hrs : element[7],
+				};
 
-                // loop through all bills and create a bill objects from it
-                data_body.forEach(element => { 
+				billArray.push(billObj);
+			});
 
-                        const bill_obj = {
-                                'employee' : element[0],
-                                'hour_rate' : element[1],
-                                'project' : element[2],
-                                'cost' : element[6],
-                                'num_hrs' : element[7]
-                        }
+			// group all similar bills based on the projects 
+			const groupData = _.groupBy(billArray, (b) => b.project);
 
-                        bill_array.push(bill_obj)
-                });
+			// get all the project keys
+			const companykeys = Object.keys(groupData);
 
+			// create each company container
+			let  companyData: any[] = [];
 
-                // group all similar bills based on the projects 
-                let group_data = _.groupBy(bill_array, function(b) { return b.project})
+			// loop through each keys ans store each company bills in an array of aray
+			companykeys.forEach((key) => {
+				companyData.push(groupData[key]);
+			});
 
-                // get all the project keys
-                const company_keys = Object.keys(group_data);
+			// remove temp file
+			fs.unlinkSync(req.file.path);   
 
-                // create each company container
-                let company_data:Array<Array<Object>> = []
-
-                // loop through each keys ans store each company bills in an array of aray
-                company_keys.forEach(key => {
-                        company_data.push(group_data[key]);
-                });
-
-                // remove temp file
-                fs.unlinkSync(req.file.path);   
-
-                //send data along with the invoice
-                res.render("invoice", { data: company_data })
-        })
+			// send data along with the invoice
+			res.render("invoice", { data: companyData });
+	});
 });
 
-function getHourDifference(start: string, end: string){
+function getHourDifference(start: string, end: string) {
 
-        let m_start = moment(start);
-        let m_end = moment(end);
-
-        let num_hours = m_end.diff(m_start, "hours")
-        
-        return num_hours;
+	const mStart = moment(start);
+	const mEnd = moment(end);
+		
+	const numHours = mEnd.diff(mStart, "hours");
+	return numHours;
 }
-
 
 module.exports = router;

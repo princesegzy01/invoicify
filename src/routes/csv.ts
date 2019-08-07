@@ -26,6 +26,12 @@ router.post("/", upload.single("csvdata"), (req: express.Request , res: express.
 	
 			if (x === 0 ) {
 
+				// if(data.length !== 6){
+
+				// 	res.render("index", { errorData: {
+				// 		message : "Uploaded csv contains Invalid colum length"
+				// 	}, title: "Invoicify" });
+				// }
 				// add extra colum headers to the headings
 				dataLine.push("cost");
 				dataLine.push("num hrs");
@@ -78,7 +84,7 @@ router.post("/", upload.single("csvdata"), (req: express.Request , res: express.
 			});
 
 			// group all similar bills based on the projects 
-			const groupData = _.groupBy(billArray, (b) => b.project);
+			const groupData = _.groupBy(billArray, (b: any) => b.project);
 
 			// get all the project keys
 			const companykeys = Object.keys(groupData);

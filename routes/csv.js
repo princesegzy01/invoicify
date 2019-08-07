@@ -19,6 +19,11 @@ router.post("/", upload.single("csvdata"), function (req, res, next) {
     csv.parseFile(req.file.path).on("data", function (data) {
         var dataLine = data;
         if (x === 0) {
+            // if(data.length !== 6){
+            // 	res.render("index", { errorData: {
+            // 		message : "Uploaded csv contains Invalid colum length"
+            // 	}, title: "Invoicify" });
+            // }
             // add extra colum headers to the headings
             dataLine.push("cost");
             dataLine.push("num hrs");

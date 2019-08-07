@@ -7,6 +7,6 @@ var express_1 = __importDefault(require("express"));
 var router = express_1.default.Router();
 /* GET home page. */
 router.get("/", function (req, res, next) {
-    res.render("index", { title: "Invoicify" });
+    res.render("index", { title: "Invoicify", errorData: { message: "" } });
 });
 module.exports = router;

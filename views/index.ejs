@@ -64,12 +64,21 @@
                       <!-- The name here is important, and will be used later to reference the data -->
                       <input type="file" name="csvdata" ref="csvdata" v-on:change="handleFileUpload()" accept="text/cvs">
                   </div>
+
+                  <% if(errorData.message){ %>
+                    <div class="warning-div">
+                      <span class="span-warning">
+                        <%= errorData.message; %>
+                      </span>
+                    </div>
+                  <% } %>
+
                   <div class="warning-div">
-                    <span class="span-warning">
-                        {{ warning }}
-                    </span>
-                    
-                  </div>
+                      <span class="span-warning">
+                          {{ warning }}
+                      </span>
+                      
+                    </div>
                   <p></p>
                   <div>
                       <input @click.stop.prevent="validateForm()" type="submit" class="button" value="Upload CSV"/>
@@ -99,7 +108,7 @@
             handleFileUpload(){
 
               this.warning  = "";
-              
+
               const file = this.$refs.csvdata.files[0];
 
               if(file.type !== "text/csv"){
